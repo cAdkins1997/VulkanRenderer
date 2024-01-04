@@ -15,7 +15,7 @@
 namespace renderer {
     class Application {
     public:
-        static constexpr int WIDTH = 1920, HEIGHT = 1080;
+        static constexpr int WIDTH = 800, HEIGHT = 600;
 
         Application();
         ~Application();
@@ -29,11 +29,14 @@ namespace renderer {
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
+        void freeCommandBuffers();
         void drawFrame();
+        void recreateSwapChain();
+        void recordCommandBuffers(int imageIndex);
 
         Window window{WIDTH, HEIGHT, "Vulkan"};
         Device device{window};
-        SwapChain swapChain{device, window.getExtent()};
+        std::unique_ptr<SwapChain> swapChain;
         std::unique_ptr<Pipeline> pipeline;
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;

@@ -20,12 +20,17 @@ namespace renderer {
         VkExtent2D getExtent() { return {static_cast<uint32_t>(windowWidth),
                                          static_cast<uint32_t>(windowHeight)
         }; }
+        [[nodiscard]] bool wasWindowResized() const { return frameBufferResized; }
+        void resetWindowResizedFlag() { frameBufferResized = false; }
+
         void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
     private:
         void initWindow();
+        static void frameBufferResizeCallback(GLFWwindow *window, int width, int height);
 
-        const int windowWidth, windowHeight;
+        int windowWidth, windowHeight;
+        bool frameBufferResized = false;
 
         std::string name;
         GLFWwindow* window;

@@ -16,14 +16,20 @@
 namespace renderer{
 
     struct PipelineConfigInfo {
-        VkViewport viewport;
-        VkRect2D scissor;
+        PipelineConfigInfo(const PipelineConfigInfo&) = delete;
+        PipelineConfigInfo& operator = (const PipelineConfigInfo&) = delete;
+
+        VkPipelineViewportStateCreateInfo viewportCI;
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyCI;
         VkPipelineRasterizationStateCreateInfo rasterizationCI;
         VkPipelineMultisampleStateCreateInfo multisampleCI;
         VkPipelineColorBlendAttachmentState colorBlendAttachmentCI;
         VkPipelineColorBlendStateCreateInfo colorBlendCI;
         VkPipelineDepthStencilStateCreateInfo depthStencilCI;
+
+        std::vector<VkDynamicState> dynamicStateEnables;
+        VkPipelineDynamicStateCreateInfo dynamicStateCI;
+
         VkPipelineLayout pipelineLayout = nullptr;
         VkRenderPass renderPass = nullptr;
         uint32_t subpass = 0;
@@ -38,9 +44,9 @@ namespace renderer{
         ~Pipeline();
 
         Pipeline(const Pipeline&) = delete;
-        void operator = (const Pipeline&) = delete;
+        Pipeline operator = (const Pipeline&) = delete;
 
-        static PipelineConfigInfo defaultPipelineConfigInfo(uint32_t width, uint32_t height);
+        static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
         void bind(VkCommandBuffer commandBuffer);
 
 
