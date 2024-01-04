@@ -8,9 +8,13 @@
 #include "SwapChain.hpp"
 #include "Model.h"
 
+#include "../engine/Object.h"
+
 #include <memory>
 #include <stdexcept>
 #include <array>
+
+#include <glm/gtc/constants.hpp>
 
 namespace renderer {
     class Application {
@@ -25,7 +29,7 @@ namespace renderer {
         void run();
 
     private:
-        void loadModels();
+        void loadObjects();
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
@@ -33,6 +37,7 @@ namespace renderer {
         void drawFrame();
         void recreateSwapChain();
         void recordCommandBuffers(int imageIndex);
+        void renderObjects(VkCommandBuffer commandBuffer);
 
         Window window{WIDTH, HEIGHT, "Vulkan"};
         Device device{window};
@@ -41,7 +46,7 @@ namespace renderer {
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
 
-        std::unique_ptr<Model> model;
+        std::vector<engine::Object> objects;
     };
 }
 

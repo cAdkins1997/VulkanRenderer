@@ -3,24 +3,25 @@ project(VulkanLearn)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(VulkanLearn main.cpp
-        vulkan/Device.hpp
-        vulkan/Device.cpp
-        vulkan/VulkanCommon.h
-        vulkan/Window.cpp
-        vulkan/Window.h
-        vulkan/Pipeline.cpp
-        vulkan/Pipeline.h
-        vulkan/Engine.cpp
-        vulkan/Application.cpp
-        vulkan/Application.h
-        vulkan/SwapChain.hpp
-        vulkan/SwapChain.cpp
-        vulkan/Model.cpp
-        vulkan/Model.h
+add_executable(VulkanLearn source/main.cpp
+        source/vulkan/Device.hpp
+        source/vulkan/Device.cpp
+        source/vulkan/VulkanCommon.h
+        source/vulkan/Window.cpp
+        source/vulkan/Window.h
+        source/vulkan/Pipeline.cpp
+        source/vulkan/Pipeline.h
+        source/vulkan/Application.cpp
+        source/vulkan/Application.h
+        source/vulkan/SwapChain.hpp
+        source/vulkan/SwapChain.cpp
+        source/vulkan/Model.cpp
+        source/vulkan/Model.h
+        source/engine/Object.cpp
+        source/engine/Object.h
 )
 
-find_package(Vulkan REQUIRED)
+find_package(vulkan REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan)
 
