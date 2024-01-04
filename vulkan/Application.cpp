@@ -1,6 +1,17 @@
 
 #include "Application.h"
 
+renderer::Application::Application() {
+    loadModels();
+    createPipelineLayout();
+    createPipeline();
+    createCommandBuffers();
+}
+
+renderer::Application::~Application() {
+    vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
+}
+
 void renderer::Application::run() {
 
     while(!window.shouldCLose()) {
@@ -74,7 +85,8 @@ void renderer::Application::createCommandBuffers() {
         vkCmdBeginRenderPass(commandBuffers[i], &renderPassBI, VK_SUBPASS_CONTENTS_INLINE);
 
         pipeline->bind(commandBuffers[i]);
-        vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+        model->bind(commandBuffers[i]);
+        model->draw(commandBuffers[i]);
 
         vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -99,12 +111,10 @@ void renderer::Application::drawFrame() {
     }
 }
 
-renderer::Application::Application() {
-    createPipelineLayout();
-    createPipeline();
-    createCommandBuffers();
-}
+void renderer::Application::loadModels() {
+    std::vector<Model::Vertex> vertices{{{0.0f, -0.5f}},
+                                        {{0.5f, 0.5f}},
+                                        {{-0.5f, 0.5f}}};
 
-renderer::Application::~Application() {
-        vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
+    model = std::make_unique<Model>(device, vertices);
 }

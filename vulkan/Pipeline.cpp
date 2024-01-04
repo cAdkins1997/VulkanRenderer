@@ -56,12 +56,15 @@ void renderer::Pipeline::createGraphicsPipeline(const std::string &_vertexShader
     shaderStages[1].pNext = nullptr;
     shaderStages[1].pSpecializationInfo = nullptr;
 
+    auto bindingDescriptions = renderer::Model::Vertex::getBindingDescription();
+    auto attributeDescriptions = renderer::Model::Vertex::getAttributeDescription();
+
     VkPipelineVertexInputStateCreateInfo vertexInputCI{};
     vertexInputCI.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputCI.vertexAttributeDescriptionCount = 0;
-    vertexInputCI.vertexBindingDescriptionCount = 0;
-    vertexInputCI.pVertexAttributeDescriptions = nullptr;
-    vertexInputCI.pVertexBindingDescriptions = nullptr;
+    vertexInputCI.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+    vertexInputCI.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+    vertexInputCI.pVertexAttributeDescriptions = attributeDescriptions.data();
+    vertexInputCI.pVertexBindingDescriptions = bindingDescriptions.data();
 
     VkPipelineViewportStateCreateInfo viewportCI{};
     viewportCI.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;

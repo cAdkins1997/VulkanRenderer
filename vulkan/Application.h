@@ -6,6 +6,7 @@
 #include "Window.h"
 #include "Device.hpp"
 #include "SwapChain.hpp"
+#include "Model.h"
 
 #include <memory>
 #include <stdexcept>
@@ -24,7 +25,7 @@ namespace renderer {
         void run();
 
     private:
-
+        void loadModels();
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
@@ -36,6 +37,8 @@ namespace renderer {
         std::unique_ptr<Pipeline> pipeline;
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
+
+        std::unique_ptr<Model> model;
     };
 }
 

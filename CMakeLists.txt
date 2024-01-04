@@ -16,6 +16,8 @@ add_executable(VulkanLearn main.cpp
         vulkan/Application.h
         vulkan/SwapChain.hpp
         vulkan/SwapChain.cpp
+        vulkan/Model.cpp
+        vulkan/Model.h
 )
 
 find_package(Vulkan REQUIRED)

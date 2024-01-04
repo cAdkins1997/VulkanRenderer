@@ -4,6 +4,7 @@
 
 #include "VulkanCommon.h"
 #include "Device.hpp"
+#include "Model.h"
 
 #include <string>
 #include <vector>
