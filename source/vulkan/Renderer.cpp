@@ -62,17 +62,16 @@ namespace rendering {
     }
 
     VkCommandBuffer Renderer::beginFrame() {
-        assert(!isFrameStarted && "Cannot call begin frame while a frame is already in progress");
+        assert(!isFrameStarted && "Can't call beginFrame while already in progress");
 
         auto result = swapChain->acquireNextImage(&currentImageIndex);
-
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
             recreateSwapChain();
             return nullptr;
         }
 
         if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-            throw std::runtime_error("failed to acquire swap chain image!\n");
+            throw std::runtime_error("failed to acquire swap chain image!");
         }
 
         isFrameStarted = true;
@@ -82,53 +81,52 @@ namespace rendering {
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
         if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer\n");
+            throw std::runtime_error("failed to begin recording command buffer!");
         }
-
         return commandBuffer;
     }
 
     void Renderer::endFrame() {
-        assert(isFrameStarted && "can't call end frame while a frame is not in progress");
+        assert(isFrameStarted && "Can't call endFrame while frame is not in progress");
 
         auto commandBuffer = getCurrentCommandBuffer();
         if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-            throw std::runtime_error("failed to end command buffers\n");
+            throw std::runtime_error("failed to record command buffer!");
         }
 
         auto result = swapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
-
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.wasWindowResized()) {
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
+            window.wasWindowResized()) {
             window.resetWindowResizedFlag();
             recreateSwapChain();
-        }
-
-        if (result != VK_SUCCESS) {
-            throw std::runtime_error("failed to submit command buffers\n");
+        } else if (result != VK_SUCCESS) {
+            throw std::runtime_error("failed to present swap chain image!");
         }
 
         isFrameStarted = false;
     }
 
     void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
-        assert(isFrameStarted && "can't begin swap chain render pass while a frame is not in progress");
-        assert(commandBuffer == getCurrentCommandBuffer() && "can't begin render on a command buffer from a different frame");
+        assert(isFrameStarted && "Can't call beginSwapChainRenderPass if frame is not in progress");
+        assert(
+                commandBuffer == getCurrentCommandBuffer() &&
+                "Can't begin render pass on command buffer from a different frame");
 
-        VkRenderPassBeginInfo renderPassBI{};
-        renderPassBI.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassBI.renderPass = swapChain->getRenderPass();
-        renderPassBI.framebuffer = swapChain->getFrameBuffer(currentImageIndex);
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = swapChain->getRenderPass();
+        renderPassInfo.framebuffer = swapChain->getFrameBuffer(currentImageIndex);
 
-        renderPassBI.renderArea.offset = {0, 0};
-        renderPassBI.renderArea.extent = { swapChain->getSwapChainExtent() };
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent = swapChain->getSwapChainExtent();
 
         std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = { 0.01f, 0.01f, 0.01f, 1.0f};
-        clearValues[1].depthStencil = {1.0f, 0 };
-        renderPassBI.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        renderPassBI.pClearValues = clearValues.data();
+        clearValues[0].color = {0.01f, 0.01f, 0.01f, 1.0f};
+        clearValues[1].depthStencil = {1.0f, 0};
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
 
-        vkCmdBeginRenderPass(commandBuffer, &renderPassBI, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
         VkViewport viewport{};
         viewport.x = 0.0f;
@@ -143,9 +141,9 @@ namespace rendering {
     }
 
     void Renderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) {
-        assert(isFrameStarted && "can't end swap chain render pass while a frame is not in progress");
-        assert(commandBuffer == getCurrentCommandBuffer() && "can't end render on a command buffer from a different frame");
-
+        assert(isFrameStarted && "Can't call endSwapChainRenderPass if frame is not in progress");
+        assert(commandBuffer == getCurrentCommandBuffer() &&
+                "Can't end render pass on command buffer from a different frame");
         vkCmdEndRenderPass(commandBuffer);
     }
 };
