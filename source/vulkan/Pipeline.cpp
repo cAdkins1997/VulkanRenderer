@@ -1,14 +1,14 @@
 
 #include "Pipeline.h"
 
-renderer::Pipeline::Pipeline(renderer::Device& _device,
-                             const std::string& _vertexShader,
-                             const std::string& _fragmentShader,
-                             const renderer::PipelineConfigInfo& _configInfo) : device{_device} {
+rendering::Pipeline::Pipeline(rendering::Device& _device,
+                              const std::string& _vertexShader,
+                              const std::string& _fragmentShader,
+                              const rendering::PipelineConfigInfo& _configInfo) : device{_device} {
     createGraphicsPipeline(_vertexShader, _fragmentShader, _configInfo);
 }
 
-std::vector<char> renderer::Pipeline::readFile(const std::string &filepath) {
+std::vector<char> rendering::Pipeline::readFile(const std::string &filepath) {
     std::ifstream  file(filepath, std::ios::ate | std::ios::binary);
 
     if (!file.is_open()) {
@@ -25,9 +25,9 @@ std::vector<char> renderer::Pipeline::readFile(const std::string &filepath) {
     return buffer;
 }
 
-void renderer::Pipeline::createGraphicsPipeline(const std::string &_vertexShader,
-                                                const std::string &_fragmentShader,
-                                                const renderer::PipelineConfigInfo &configInfo) {
+void rendering::Pipeline::createGraphicsPipeline(const std::string &_vertexShader,
+                                                 const std::string &_fragmentShader,
+                                                 const rendering::PipelineConfigInfo &configInfo) {
     auto vertexCode = readFile(_vertexShader);
     auto fragCode = readFile(_fragmentShader);
 
@@ -56,8 +56,8 @@ void renderer::Pipeline::createGraphicsPipeline(const std::string &_vertexShader
     shaderStages[1].pNext = nullptr;
     shaderStages[1].pSpecializationInfo = nullptr;
 
-    auto bindingDescriptions = renderer::Model::Vertex::getBindingDescription();
-    auto attributeDescriptions = renderer::Model::Vertex::getAttributeDescription();
+    auto bindingDescriptions = rendering::Model::Vertex::getBindingDescription();
+    auto attributeDescriptions = rendering::Model::Vertex::getAttributeDescription();
 
     VkPipelineVertexInputStateCreateInfo vertexInputCI{};
     vertexInputCI.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -92,7 +92,7 @@ void renderer::Pipeline::createGraphicsPipeline(const std::string &_vertexShader
     }
 }
 
-void renderer::Pipeline::createShaderModule(const std::vector<char> &code, VkShaderModule *shaderModule) {
+void rendering::Pipeline::createShaderModule(const std::vector<char> &code, VkShaderModule *shaderModule) {
     VkShaderModuleCreateInfo shaderModuleCI{};
     shaderModuleCI.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     shaderModuleCI.codeSize = code.size();
@@ -103,7 +103,7 @@ void renderer::Pipeline::createShaderModule(const std::vector<char> &code, VkSha
     }
 }
 
-void renderer::Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
+void rendering::Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
     configInfo.inputAssemblyCI.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     configInfo.inputAssemblyCI.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     configInfo.inputAssemblyCI.primitiveRestartEnable = VK_FALSE;
@@ -173,11 +173,11 @@ void renderer::Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInf
     configInfo.dynamicStateCI.flags = 0;
 }
 
-void renderer::Pipeline::bind(VkCommandBuffer commandBuffer) {
+void rendering::Pipeline::bind(VkCommandBuffer commandBuffer) {
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 }
 
-renderer::Pipeline::~Pipeline() {
+rendering::Pipeline::~Pipeline() {
     vkDestroyShaderModule(device.device(), vertexShaderModule, nullptr);
     vkDestroyShaderModule(device.device(), fragmentShaderModule, nullptr);
     vkDestroyPipeline(device.device(), graphicsPipeline, nullptr);

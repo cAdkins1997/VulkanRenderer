@@ -5,7 +5,7 @@
 #include "vulkan/Application.h"
 
 int main() {
-    renderer::Application application{};
+    rendering::Application application{};
 
     try {
         application.run();

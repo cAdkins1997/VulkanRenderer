@@ -40,7 +40,7 @@ namespace engine {
 
         uint32 getId() { return id; }
 
-        std::shared_ptr<renderer::Model> model;
+        std::shared_ptr<rendering::Model> model;
         glm::vec3 color{};
         Transform2dComponent transform2d{};
 

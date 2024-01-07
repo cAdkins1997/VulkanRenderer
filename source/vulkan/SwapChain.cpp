@@ -9,7 +9,7 @@
 #include <set>
 #include <stdexcept>
 
-namespace renderer {
+namespace rendering {
 
 SwapChain::SwapChain(Device &deviceRef, VkExtent2D extent)
     : device{deviceRef}, windowExtent{extent} {

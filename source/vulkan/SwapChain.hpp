@@ -10,7 +10,7 @@
 #include <vector>
 #include <memory>
 
-namespace renderer {
+namespace rendering {
 
 class SwapChain {
  public:

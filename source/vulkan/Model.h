@@ -9,7 +9,7 @@
 #include "VulkanCommon.h"
 #include "Device.hpp"
 
-namespace renderer {
+namespace rendering {
     class Model {
     public:
 

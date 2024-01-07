@@ -19,6 +19,8 @@ add_executable(VulkanLearn source/main.cpp
         source/vulkan/Model.h
         source/engine/Object.cpp
         source/engine/Object.h
+        source/vulkan/Renderer.cpp
+        source/vulkan/Renderer.h
 )
 
 find_package(vulkan REQUIRED)

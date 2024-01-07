@@ -13,7 +13,7 @@
 #include <iostream>
 #include <cassert>
 
-namespace renderer{
+namespace rendering{
 
     struct PipelineConfigInfo {
         PipelineConfigInfo(const PipelineConfigInfo&) = delete;
@@ -37,10 +37,10 @@ namespace renderer{
 
     class Pipeline {
     public:
-        Pipeline(renderer::Device& _device,
+        Pipeline(rendering::Device& _device,
                  const std::string& _vertexShader,
                  const std::string &_fragmentShader,
-                 const renderer::PipelineConfigInfo& _configInfo);
+                 const rendering::PipelineConfigInfo& _configInfo);
         ~Pipeline();
 
         Pipeline(const Pipeline&) = delete;
@@ -54,7 +54,7 @@ namespace renderer{
         static std::vector<char> readFile(const std::string& filepath);
         void createGraphicsPipeline(const std::string& _vertexShader,
                                     const std::string& _fragmentShader,
-                                    const renderer::PipelineConfigInfo& configInfo);
+                                    const rendering::PipelineConfigInfo& configInfo);
 
         void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 

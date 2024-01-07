@@ -7,7 +7,7 @@
 #include <string>
 #include <stdexcept>
 
-namespace renderer {
+namespace rendering {
     class Window {
     public:
         Window(int _windowWidth, int _windowHeight, std::string _name);
