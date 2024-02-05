@@ -26,7 +26,7 @@ namespace rendering {
         RenderSystem(const RenderSystem&) = delete;
         RenderSystem &operator = (const RenderSystem&) = delete;
 
-        void renderObjects(FrameInfo& frameInfo, std::vector<engine::Object>& objects);
+        void renderObjects(FrameInfo& frameInfo);
 
     private:
         void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);

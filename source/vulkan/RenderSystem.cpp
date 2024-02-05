@@ -16,7 +16,7 @@ rendering::RenderSystem::~RenderSystem() {
     vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
 }
 
-void rendering::RenderSystem::renderObjects(FrameInfo& frameInfo, std::vector<engine::Object>& objects) {
+void rendering::RenderSystem::renderObjects(FrameInfo& frameInfo) {
     pipeline->bind(frameInfo.commandBuffer);
 
     vkCmdBindDescriptorSets(
@@ -30,7 +30,8 @@ void rendering::RenderSystem::renderObjects(FrameInfo& frameInfo, std::vector<en
             nullptr
             );
 
-    for (auto& object : objects) {
+    for (auto& kvPair : frameInfo.objects) {
+        auto& object = kvPair.second;
         pushConstantsData push{};
         auto modelMatrix = object.transform.mat4();
         push.modelMatrix = object.transform.mat4();

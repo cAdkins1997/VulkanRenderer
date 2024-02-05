@@ -40,7 +40,7 @@ namespace rendering {
         Renderer renderer{window, device};
 
         std::unique_ptr<DescriptorPool> globalPool{};
-        std::vector<engine::Object> objects;
+        engine::Object::Map objects;
     };
 }
 

@@ -8,7 +8,9 @@ namespace rendering {
 
     struct GlobalUbo {
         glm::mat4 projectionView{1.0f};
-        glm::vec3 lightDirection = glm::normalize(sin(glm::vec3{1.0f * glfwGetTime(), -3.0f, -1.0f}));
+        glm::vec4 ambientLightColor{1.0f, 1.0f, 1.0f, 0.2f};
+        glm::vec3 lightPosition{(sin(-1.0f * glfwGetTime())), sin(-1.0f * glfwGetTime() * .05), -1.0f};
+        alignas(16) glm::vec4 lightColor{1.0f};
     };
 
     rendering::Application::Application() {
@@ -36,7 +38,7 @@ namespace rendering {
         }
 
         auto globalSetLayout = DescriptorSetLayout::Builder(device)
-                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
                 .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -53,6 +55,7 @@ namespace rendering {
         camera.setViewTarget(glm::vec3(-1.0f, -2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 2.0f));
 
         auto viewerObject = engine::Object::createObject();
+        viewerObject.transform.translation.z = -2.5f;
         engine::MovementController cameraController{};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -68,7 +71,7 @@ namespace rendering {
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
             float aspect = renderer.getAspectRatio();
-            camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
+            camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 1000.0f);
 
             if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
@@ -77,7 +80,8 @@ namespace rendering {
                     frameTime,
                     commandBuffer,
                     camera,
-                    globalDescriptorSets[frameIndex]
+                    globalDescriptorSets[frameIndex],
+                    objects
                 };
 
                 GlobalUbo ubo{};
@@ -86,7 +90,7 @@ namespace rendering {
                 uboBuffers[frameIndex]->flush();
 
                 renderer.beginSwapChainRenderPass(commandBuffer);
-                renderSystem.renderObjects(frameInfo, objects);
+                renderSystem.renderObjects(frameInfo);
                 renderer.endSwapChainRenderPass(commandBuffer);
                 renderer.endFrame();
             }
@@ -96,10 +100,17 @@ namespace rendering {
 
     void rendering::Application::loadObjects() {
         std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/smooth_vase.obj");
-        auto object = engine::Object::createObject();
-        object.model = model;
-        object.transform.translation = {0.0f, 0.5f, 2.5f};
-        object.transform.scale = {glm::vec3(3.0f)};
-        objects.push_back(std::move(object));
+        auto smoothVase = engine::Object::createObject();
+        smoothVase.model = model;
+        smoothVase.transform.translation = {0.0f, 0.5f, 0.0f};
+        smoothVase.transform.scale = {glm::vec3(3.0f)};
+        objects.emplace(smoothVase.getId(), std::move(smoothVase));
+
+        model = Model::createModelFromFile(device, "../models/quad.obj");
+        auto floor = engine::Object::createObject();
+        floor.model = model;
+        floor.transform.translation = {0.0f, 0.5f, 0.0f};
+        floor.transform.scale = {glm::vec3(3.0f, 1.0f, 3.0f)};
+        objects.emplace(floor.getId(), std::move(floor));
     }
 };

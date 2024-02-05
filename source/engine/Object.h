@@ -5,8 +5,8 @@
 #include "../vulkan/Model.h"
 
 #include <memory>
-
 #include <glm/gtc/matrix_transform.hpp>
+#include <unordered_map>
 
 namespace engine {
 
@@ -19,10 +19,11 @@ namespace engine {
         [[nodiscard]] glm::mat3 normalMatrix() const;
     };
 
-    using uint32 = unsigned int;
-
     class Object {
     public:
+        using uint32 = unsigned int;
+        using Map = std::unordered_map<uint32, Object>;
+
         explicit Object(uint32 objId) : id{objId} {}
 
         Object(const Object&) = delete;
