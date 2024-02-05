@@ -22,8 +22,8 @@ namespace rendering {
         }; }
         [[nodiscard]] bool wasWindowResized() const { return frameBufferResized; }
         void resetWindowResizedFlag() { frameBufferResized = false; }
-
         void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
+        GLFWwindow *getGLFWWindow() const { return window; }
 
     private:
         void initWindow();

@@ -15,7 +15,7 @@ namespace rendering {
     }
 
     void rendering::Renderer::createCommandBuffers() {
-        commandBuffers.resize(swapChain->imageCount());
+        commandBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
         VkCommandBufferAllocateInfo commandBufferAI;
         commandBufferAI.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -44,11 +44,11 @@ namespace rendering {
             swapChain = std::make_unique<SwapChain>(device, extent);
         }
         else  {
-            swapChain = std::make_unique<SwapChain>(device, extent, std::move(swapChain));
+            std::shared_ptr<SwapChain> oldSwapChaim = std::move(swapChain);
+            swapChain = std::make_unique<SwapChain>(device, extent, oldSwapChaim);
 
-            if (swapChain->imageCount() != commandBuffers.size()) {
-                freeCommandBuffers();
-                createCommandBuffers();
+            if (!oldSwapChaim->compareSwapFormats(*swapChain.get())) {
+                throw std::runtime_error("Swap chain image (or depth) format has changed!");
             }
         }
     }
@@ -104,6 +104,7 @@ namespace rendering {
         }
 
         isFrameStarted = false;
+        currentFrameIndex = (currentFrameIndex + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
     }
 
     void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
@@ -112,21 +113,21 @@ namespace rendering {
                 commandBuffer == getCurrentCommandBuffer() &&
                 "Can't begin render pass on command buffer from a different frame");
 
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = swapChain->getRenderPass();
-        renderPassInfo.framebuffer = swapChain->getFrameBuffer(currentImageIndex);
+        VkRenderPassBeginInfo renderPassBI{};
+        renderPassBI.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassBI.renderPass = swapChain->getRenderPass();
+        renderPassBI.framebuffer = swapChain->getFrameBuffer(currentImageIndex);
 
-        renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = swapChain->getSwapChainExtent();
+        renderPassBI.renderArea.offset = {0, 0};
+        renderPassBI.renderArea.extent = swapChain->getSwapChainExtent();
 
         std::array<VkClearValue, 2> clearValues{};
         clearValues[0].color = {0.01f, 0.01f, 0.01f, 1.0f};
         clearValues[1].depthStencil = {1.0f, 0};
-        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        renderPassInfo.pClearValues = clearValues.data();
+        renderPassBI.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassBI.pClearValues = clearValues.data();
 
-        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBeginRenderPass(commandBuffer, &renderPassBI, VK_SUBPASS_CONTENTS_INLINE);
 
         VkViewport viewport{};
         viewport.x = 0.0f;

@@ -2,17 +2,18 @@
 #ifndef VULKANLEARN_APPLICATION_H
 #define VULKANLEARN_APPLICATION_H
 
-#include "Pipeline.h"
 #include "Window.h"
 #include "Device.hpp"
 #include "Model.h"
 #include "Renderer.h"
+#include "RenderSystem.h"
 
 #include "../engine/Object.h"
 
 #include <memory>
 #include <stdexcept>
 #include <array>
+#include <chrono>
 
 #include <glm/gtc/constants.hpp>
 
@@ -31,16 +32,10 @@ namespace rendering {
 
     private:
         void loadObjects();
-        void createPipelineLayout();
-        void createPipeline();
-        void renderObjects(VkCommandBuffer commandBuffer);
 
         Window window{WIDTH, HEIGHT, "Vulkan"};
         Device device{window};
         Renderer renderer{window, device};
-
-        std::unique_ptr<Pipeline> pipeline;
-        VkPipelineLayout pipelineLayout;
 
         std::vector<engine::Object> objects;
     };

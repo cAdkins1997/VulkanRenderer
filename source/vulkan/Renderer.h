@@ -30,10 +30,15 @@ namespace rendering {
         void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
         [[nodiscard]] VkRenderPass getSwapChainRenderPass() const { return swapChain->getRenderPass(); }
+        float getAspectRatio() const { return swapChain->extentAspectRatio(); }
         [[nodiscard]] bool isFrameInProgress() const { return isFrameStarted; }
         [[nodiscard]] VkCommandBuffer getCurrentCommandBuffer() const {
             assert(isFrameStarted && "Cannot get command buffer when frame not in progress");
-            return commandBuffers[currentImageIndex];
+            return commandBuffers[currentFrameIndex];
+        }
+        [[nodiscard]] int getFrameIndex() const {
+            assert(isFrameStarted && "Cannot get frame index when frame not in progress");
+            return currentFrameIndex;
         }
 
 
@@ -47,8 +52,9 @@ namespace rendering {
         std::unique_ptr<SwapChain> swapChain;
         std::vector<VkCommandBuffer> commandBuffers;
 
-        uint32_t currentImageIndex;
-        bool isFrameStarted;
+        uint32_t currentImageIndex = 0;
+        int currentFrameIndex = 0;
+        bool isFrameStarted = false;
     };
 }
 

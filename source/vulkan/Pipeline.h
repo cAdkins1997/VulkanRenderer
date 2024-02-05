@@ -1,6 +1,6 @@
 
 #ifndef VULKANLEARN_PIPELINE_H
-#define VULKANLEARN
+#define VULKANLEARN_PIPELINE_H
 
 #include "VulkanCommon.h"
 #include "Device.hpp"

@@ -6,20 +6,17 @@
 
 #include <memory>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace engine {
 
-    struct Transform2dComponent {
-        glm::vec2 translation{};
-        glm::vec2 scale{1.0f, 1.0f};
-        float rotation;
+    struct TransformComponent {
+        glm::vec3 translation{};
+        glm::vec3 scale{1.0f, 1.0f, 1.0f};
+        glm::vec3 rotation{};
 
-        [[nodiscard]] glm::mat2 mat2() const {
-            const float s = glm::sin(rotation);
-            const float c = glm::cos(rotation);
-            glm::mat2 rotationMatrix{{c, s}, {-s, c}};
-            glm::mat2 scaleMat{{scale.x, 0.0f}, {0.0f, scale.y}};
-            return rotationMatrix * scaleMat;
-        }
+        [[nodiscard]] glm::mat4 mat4() const;
+        [[nodiscard]] glm::mat3 normalMatrix() const;
     };
 
     using uint32 = unsigned int;
@@ -42,7 +39,7 @@ namespace engine {
 
         std::shared_ptr<rendering::Model> model;
         glm::vec3 color{};
-        Transform2dComponent transform2d{};
+        TransformComponent transform{};
 
     private:
         uint32 id;
