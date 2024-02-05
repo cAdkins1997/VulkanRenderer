@@ -6,6 +6,7 @@
 #include "Device.hpp"
 #include "Model.h"
 #include "Camera.h"
+#include "FrameInfo.h"
 
 #include "../engine/Object.h"
 
@@ -19,16 +20,16 @@ namespace rendering {
     class RenderSystem {
     public:
 
-        RenderSystem(Device& _device, VkRenderPass renderPass);
+        RenderSystem(Device& _device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
         ~RenderSystem();
 
         RenderSystem(const RenderSystem&) = delete;
         RenderSystem &operator = (const RenderSystem&) = delete;
 
-        void renderObjects(VkCommandBuffer commandBuffer, std::vector<engine::Object>& objects, const Camera& camera);
+        void renderObjects(FrameInfo& frameInfo, std::vector<engine::Object>& objects);
 
     private:
-        void createPipelineLayout();
+        void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
         void createPipeline(VkRenderPass renderPass);
 
         Device& device;

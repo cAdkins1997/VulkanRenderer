@@ -7,6 +7,8 @@
 #include "Model.h"
 #include "Renderer.h"
 #include "RenderSystem.h"
+#include "FrameInfo.h"
+#include "Descriptor.h"
 
 #include "../engine/Object.h"
 
@@ -37,6 +39,7 @@ namespace rendering {
         Device device{window};
         Renderer renderer{window, device};
 
+        std::unique_ptr<DescriptorPool> globalPool{};
         std::vector<engine::Object> objects;
     };
 }

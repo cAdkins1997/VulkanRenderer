@@ -2,12 +2,13 @@
 #include "RenderSystem.h"
 
 struct pushConstantsData {
-    glm::mat4 transform{1.0f};
+    glm::mat4 modelMatrix{1.0f};
     glm::mat4 normalMatrix{1.0f};
 };
 
-rendering::RenderSystem::RenderSystem(rendering::Device& _device, VkRenderPass renderPass) : device(_device)  {
-    createPipelineLayout();
+rendering::RenderSystem::RenderSystem(
+        rendering::Device& _device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : device(_device)  {
+    createPipelineLayout(globalSetLayout);
     createPipeline(renderPass);
 }
 
@@ -15,40 +16,51 @@ rendering::RenderSystem::~RenderSystem() {
     vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
 }
 
-void rendering::RenderSystem::renderObjects(VkCommandBuffer commandBuffer, std::vector<engine::Object> &objects, const Camera& camera) {
-    pipeline->bind(commandBuffer);
+void rendering::RenderSystem::renderObjects(FrameInfo& frameInfo, std::vector<engine::Object>& objects) {
+    pipeline->bind(frameInfo.commandBuffer);
 
-    auto projectionView = camera.getProjection() * camera.getView();
+    vkCmdBindDescriptorSets(
+            frameInfo.commandBuffer,
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            pipelineLayout,
+            0,
+            1,
+            &frameInfo.globalDescriptorSet,
+            0,
+            nullptr
+            );
 
     for (auto& object : objects) {
         pushConstantsData push{};
         auto modelMatrix = object.transform.mat4();
-        push.transform = projectionView * modelMatrix;
+        push.modelMatrix = object.transform.mat4();
         push.normalMatrix = object.transform.normalMatrix();
 
         vkCmdPushConstants(
-                commandBuffer,
+                frameInfo.commandBuffer,
                 pipelineLayout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
                 sizeof(pushConstantsData),
                 &push);
 
-        object.model->bind(commandBuffer);
-        object.model->draw(commandBuffer);
+        object.model->bind(frameInfo.commandBuffer);
+        object.model->draw(frameInfo.commandBuffer);
     }
 }
 
-void rendering::RenderSystem::createPipelineLayout() {
+void rendering::RenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     pushConstantRange.offset = 0;
     pushConstantRange.size = sizeof(pushConstantsData);
 
+    std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
+
     VkPipelineLayoutCreateInfo pipelineLayoutCI{};
     pipelineLayoutCI.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutCI.setLayoutCount = 0;
-    pipelineLayoutCI.pSetLayouts = nullptr;
+    pipelineLayoutCI.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+    pipelineLayoutCI.pSetLayouts = descriptorSetLayouts.data();
     pipelineLayoutCI.pushConstantRangeCount = 1;
     pipelineLayoutCI.pPushConstantRanges = &pushConstantRange;
 

@@ -10,6 +10,7 @@
 
 #include "VulkanCommon.h"
 #include "Device.hpp"
+#include "Buffer.h"
 
 namespace rendering {
     class Model {
@@ -54,13 +55,11 @@ namespace rendering {
 
         Device& device;
 
-        VkBuffer vertexBuffer;
-        VkDeviceMemory vertexBufferMemory;
-        uint32_t  vertexCount;
+        std::unique_ptr<Buffer> vertexBuffer;
+        uint32_t vertexCount;
 
         bool hasIndexBuffer = false;
-        VkBuffer indexBuffer;
-        VkDeviceMemory indexBufferMemory;
+        std::unique_ptr<Buffer> indexBuffer;
         uint32_t  indexCount;
     };
 

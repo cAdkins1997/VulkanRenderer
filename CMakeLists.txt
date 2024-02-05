@@ -29,6 +29,11 @@ add_executable(VulkanLearn source/main.cpp
         source/engine/MovementController.h
         source/vulkan/renderingutility.h
         include/tiny_obj_loader.h
+        source/vulkan/Buffer.cpp
+        source/vulkan/Buffer.h
+        source/vulkan/FrameInfo.h
+        source/vulkan/Descriptor.cpp
+        source/vulkan/Descriptor.h
 )
 
 find_package(vulkan REQUIRED)
